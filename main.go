@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	// "errors"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -25,11 +28,12 @@ type EuiConfig struct {
 type Config struct {
 	EuiUrl    string
 	EuiConfig EuiConfig
+	Response  http.Response
 }
 
 func main() {
 	newConfig := Config{
-		EuiUrl: "http://localhost:8080",
+		EuiUrl: "http://localhost:8080/",
 		EuiConfig: EuiConfig{
 			EsUrl:             "https://api3.test.wizepass.com",
 			RpUrl:             "https://api3.test.wizepass.com",
@@ -98,11 +102,19 @@ func main() {
 
 	sendConfigRequest := func() {
 		time.Sleep(1 * time.Second)
+		configJson, err := json.Marshal(newConfig.EuiConfig)
+		if err != nil {
+			panic("Unable to parse json")
+		}
+		resp, err := http.Post(newConfig.EuiUrl, "application/json", bytes.NewReader(configJson))
+		if err != nil {
+			panic(fmt.Sprintf("Unable to send request: %s", err))
+		}
+		newConfig.Response = *resp
 	}
 
 	_ = spinner.New().Title("Sending config...").Accessible(accessible).Action(sendConfigRequest).Run()
 
-	// Print order summary.
 	{
 		var sb strings.Builder
 		keyword := func(s string) string {
@@ -152,6 +164,7 @@ func main() {
 			)
 		}
 
+		fmt.Fprintf(&sb, "\n\n%s", newConfig.Response.Status)
 		fmt.Fprint(&sb, "\n\nThanks for using EuiConfig!")
 
 		fmt.Println(
