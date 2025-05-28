@@ -28,7 +28,23 @@ type Config struct {
 }
 
 func main() {
-	newConfig := Config{}
+	newConfig := Config{
+		EuiUrl: "http://localhost:8080",
+		EuiConfig: EuiConfig{
+			EsUrl:             "https://api3.test.wizepass.com",
+			RpUrl:             "https://api3.test.wizepass.com",
+			RpSignId:          "a0759625-f432-41f6-9dca-0c42e51aa1d5",
+			RpRequestRequired: false,
+			RevokeComments: []string{
+				"unspecified",
+				"key_compromise",
+				"affiliation_changed",
+				"superseded",
+				"cessation_of_operation",
+				"privilege_withdrawn",
+			},
+		},
+	}
 
 	// Should we run in accessible mode?
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
@@ -42,7 +58,7 @@ func main() {
 			huh.NewInput().
 				Value(&newConfig.EuiUrl).
 				Title("Please enter Eui Url").
-				Placeholder("http://localhost.com:8080").
+				Placeholder(newConfig.EuiUrl).
 				Description("The url to the Eui to configure"),
 		),
 
@@ -81,7 +97,7 @@ func main() {
 	}
 
 	sendConfigRequest := func() {
-		time.Sleep(2 * time.Second)
+		time.Sleep(1 * time.Second)
 	}
 
 	_ = spinner.New().Title("Sending config...").Accessible(accessible).Action(sendConfigRequest).Run()
@@ -92,17 +108,55 @@ func main() {
 		keyword := func(s string) string {
 			return lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Render(s)
 		}
+
+		fmt.Fprintf(&sb, "%s\n\n", lipgloss.NewStyle().Bold(true).Render("CONFIG"))
+
 		fmt.Fprintf(&sb,
-			"%s\n\n%s ",
-			lipgloss.NewStyle().Bold(true).Render("CONFIG"),
+			"%s%s\n",
+			lipgloss.NewStyle().Bold(true).Render("EUI Url: "),
 			keyword(newConfig.EuiUrl),
 		)
+
+		fmt.Fprintf(&sb,
+			"%s%s\n",
+			lipgloss.NewStyle().Bold(true).Render("Es Url: "),
+			keyword(newConfig.EuiConfig.EsUrl),
+		)
+		fmt.Fprintf(&sb,
+			"%s%s\n",
+			lipgloss.NewStyle().Bold(true).Render("Rp Url: "),
+			keyword(newConfig.EuiConfig.RpUrl),
+		)
+
+		if newConfig.EuiConfig.RpRequestRequired {
+			fmt.Fprintf(&sb,
+				"%s%s\n",
+				lipgloss.NewStyle().Bold(true).Render("Rp request Required: "),
+				keyword("true"),
+			)
+			fmt.Fprintf(&sb,
+				"%s%s\n",
+				lipgloss.NewStyle().Bold(true).Render("Rp Sign ID: "),
+				keyword(newConfig.EuiConfig.RpSignId),
+			)
+		}
+
+		fmt.Fprintf(&sb,
+			"%s\n",
+			lipgloss.NewStyle().Bold(true).Render("Revoke comments:"),
+		)
+		for _, v := range newConfig.EuiConfig.RevokeComments {
+			fmt.Fprintf(&sb,
+				"%s\n",
+				keyword(v),
+			)
+		}
 
 		fmt.Fprint(&sb, "\n\nThanks for using EuiConfig!")
 
 		fmt.Println(
 			lipgloss.NewStyle().
-				Width(40).
+				Width(80).
 				BorderStyle(lipgloss.RoundedBorder()).
 				BorderForeground(lipgloss.Color("63")).
 				Padding(1, 2).
