@@ -1,15 +1,11 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	// "errors"
 	"fmt"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/huh/spinner"
@@ -33,7 +29,7 @@ type Config struct {
 
 func main() {
 	newConfig := Config{
-		EuiUrl: "http://localhost:8080/",
+		EuiUrl: "http://localhost:8080",
 		EuiConfig: EuiConfig{
 			EsUrl:             "https://api3.test.wizepass.com",
 			RpUrl:             "https://api3.test.wizepass.com",
@@ -48,6 +44,11 @@ func main() {
 				"privilege_withdrawn",
 			},
 		},
+	}
+
+	client := Client{
+		EuiUrl:    &newConfig.EuiUrl,
+		EuiConfig: &newConfig.EuiConfig,
 	}
 
 	// Should we run in accessible mode?
@@ -100,20 +101,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	sendConfigRequest := func() {
-		time.Sleep(1 * time.Second)
-		configJson, err := json.Marshal(newConfig.EuiConfig)
-		if err != nil {
-			panic("Unable to parse json")
-		}
-		resp, err := http.Post(newConfig.EuiUrl, "application/json", bytes.NewReader(configJson))
-		if err != nil {
-			panic(fmt.Sprintf("Unable to send request: %s", err))
-		}
-		newConfig.Response = *resp
-	}
-
-	_ = spinner.New().Title("Sending config...").Accessible(accessible).Action(sendConfigRequest).Run()
+	_ = spinner.New().Title("Sending config...").Accessible(accessible).Action(client.SendConfig).Run()
 
 	{
 		var sb strings.Builder
@@ -164,7 +152,7 @@ func main() {
 			)
 		}
 
-		fmt.Fprintf(&sb, "\n\n%s", newConfig.Response.Status)
+		fmt.Fprintf(&sb, "\n\n%s", client.Response.Status)
 		fmt.Fprint(&sb, "\n\nThanks for using EuiConfig!")
 
 		fmt.Println(
