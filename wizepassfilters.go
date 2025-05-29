@@ -1,6 +1,13 @@
 package main
 
-import "github.com/charmbracelet/huh"
+import (
+	"fmt"
+	"os"
+	"strconv"
+
+	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/huh/spinner"
+)
 
 type WizepassFilter struct {
 	Field       string `json:"field"`
@@ -139,6 +146,36 @@ var WIZEPASS_ATTRIBUTE_OPTIONS = []WizepassFilter{
 		State:       false,
 		Entity:      "wizepass_attribute",
 	},
+}
+
+func FiltersForm(client *Client, newConfig *Config) {
+	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
+
+	dtoOptions := ConvertFiltersToHuhOptions(WIZEPASS_DTO_OPTIONS)
+	attributeOptions := ConvertFiltersToHuhOptions(WIZEPASS_ATTRIBUTE_OPTIONS)
+
+	filtersForm := huh.NewForm(
+		huh.NewGroup(
+			huh.NewMultiSelect[string]().
+				Options(dtoOptions...).
+				Title("Wizepass DTO Filters").
+				Value(&newConfig.SelectedDTOFilters),
+		),
+		huh.NewGroup(
+			huh.NewMultiSelect[string]().
+				Options(attributeOptions...).
+				Title("Wizepass Attribute Filters").
+				Value(&newConfig.SelectedAttributeFilters),
+		),
+	).WithAccessible(accessible)
+
+	err := filtersForm.Run()
+	if err != nil {
+		fmt.Println("Uh oh:", err)
+		os.Exit(1)
+	}
+
+	_ = spinner.New().Title("Sending filters...").Accessible(accessible).Action(client.SendFilters).Run()
 }
 
 func ConvertFiltersToHuhOptions(filters []WizepassFilter) []huh.Option[string] {

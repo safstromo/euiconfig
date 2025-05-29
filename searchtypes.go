@@ -1,0 +1,58 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"strconv"
+
+	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/huh/spinner"
+)
+
+type SearchType struct {
+	Entity string `json:"entity"`
+	Type   string `json:"type"`
+	State  bool   `json:"state"`
+}
+
+// TODO: fix description/cleanup/refactor
+func SearchTypeForm(client *Client, newConfig *Config) {
+	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
+
+	moreTypes := true
+
+	for moreTypes {
+		newSearchType := SearchType{
+			State:  true,
+			Entity: "wizepass",
+		}
+
+		searchTypeForm := huh.NewForm(huh.NewGroup(
+			huh.NewNote().
+				Title("Add SearchTypes").
+				Description("EUi seachtypes.\n"),
+
+			huh.NewInput().
+				Value(&newSearchType.Type).
+				Title("Please enter type").
+				Placeholder("user_id").
+				Description("Fields to search for"),
+
+			huh.NewConfirm().
+				Title("Add more searchtypes?").
+				Value(&moreTypes).
+				Affirmative("Yes!").
+				Negative("No.").
+				Description("Continue to add more searchTypes"),
+		)).WithAccessible(accessible)
+
+		err := searchTypeForm.Run()
+		if err != nil {
+			fmt.Println("Uh oh:", err)
+			os.Exit(1)
+		}
+		newConfig.AddedTypes = append(newConfig.AddedTypes, newSearchType)
+	}
+
+	_ = spinner.New().Title("Sending Searchtypes config...").Accessible(accessible).Action(client.SendSearchTypes).Run()
+}
