@@ -16,6 +16,8 @@ type Client struct {
 	Es                       *Es
 	Validity                 *Validity
 	SearchTypes              *[]SearchType
+	AddedGroupRights         *[]GroupRight
+	AddedUserDbs             *[]Userdb
 	Response                 http.Response
 }
 

@@ -27,6 +27,8 @@ type Config struct {
 	SelectedAttributeFilters []string
 	Es                       Es
 	AddedTypes               []SearchType
+	AddedGroupRights         []GroupRight
+	AddedUserDbs             []Userdb
 	Response                 http.Response
 }
 
@@ -68,6 +70,8 @@ func main() {
 		Es:                       &newConfig.Es,
 		Validity:                 &newConfig.Es.Validity,
 		SearchTypes:              &newConfig.AddedTypes,
+		AddedGroupRights:         &newConfig.AddedGroupRights,
+		AddedUserDbs:             &newConfig.AddedUserDbs,
 	}
 
 	// Should we run in accessible mode?
