@@ -93,10 +93,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	EuiConfigForm(&client, &newConfig)
-	FiltersForm(&client, &newConfig)
-	EsConnectionForm(&client, &newConfig)
-	SearchTypeForm(&client, &newConfig)
+	// EuiConfigForm(&client, &newConfig)
+	// FiltersForm(&client, &newConfig)
+	// EsConnectionForm(&client, &newConfig)
+	// SearchTypeForm(&client, &newConfig)
+	GroupRightsForm(&client, &newConfig)
 
 	{
 		var sb strings.Builder

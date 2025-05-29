@@ -133,6 +133,25 @@ func (c *Client) SendSearchTypes() {
 	}
 }
 
+// TODO: Cleanup/logging/errorhandling
+// TODO: replace with added grouprighs to be able to add userdbs
+func (c *Client) SendGroupRights() {
+	url := fmt.Sprintf("%s/eui/config/rights", *c.EuiUrl)
+
+	for _, groupRight := range *c.AddedGroupRights {
+		searchJson, err := json.Marshal(groupRight)
+		if err != nil {
+			panic("Unable to parse json")
+		}
+
+		resp, err := http.Post(url, "application/json", bytes.NewReader(searchJson))
+		if err != nil {
+			panic(fmt.Sprintf("Unable to send request: %s", err))
+		}
+		printResponse("Group rights", resp)
+	}
+}
+
 func printResponse(title string, res *http.Response) {
 	defer res.Body.Close()
 
