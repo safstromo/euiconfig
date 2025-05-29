@@ -77,7 +77,7 @@ func main() {
 
 		huh.NewGroup(huh.NewNote().
 			Title("Eui Config").
-			Description("Welcome to _EuiConfig™_.\n"),
+			Description("Welcome to _EuiConfig™_.\nDont forget to disable auth"),
 
 			huh.NewInput().
 				Value(&newConfig.EuiUrl).
@@ -98,6 +98,7 @@ func main() {
 	// EsConnectionForm(&client, &newConfig)
 	// SearchTypeForm(&client, &newConfig)
 	GroupRightsForm(&client, &newConfig)
+	UserDbConnectionForm(&client, &newConfig)
 
 	{
 		var sb strings.Builder

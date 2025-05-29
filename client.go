@@ -139,16 +139,33 @@ func (c *Client) SendGroupRights() {
 	url := fmt.Sprintf("%s/eui/config/rights", *c.EuiUrl)
 
 	for _, groupRight := range *c.AddedGroupRights {
-		searchJson, err := json.Marshal(groupRight)
+		grouprightJson, err := json.Marshal(groupRight)
 		if err != nil {
 			panic("Unable to parse json")
 		}
 
-		resp, err := http.Post(url, "application/json", bytes.NewReader(searchJson))
+		resp, err := http.Post(url, "application/json", bytes.NewReader(grouprightJson))
 		if err != nil {
 			panic(fmt.Sprintf("Unable to send request: %s", err))
 		}
 		printResponse("Group rights", resp)
+	}
+}
+
+func (c *Client) SendUserdbConnection() {
+	url := fmt.Sprintf("%s/eui/config/userdb", *c.EuiUrl)
+
+	for _, userdb := range *c.AddedUserDbs {
+		userdbJson, err := json.Marshal(userdb)
+		if err != nil {
+			panic("Unable to parse json")
+		}
+
+		resp, err := http.Post(url, "application/json", bytes.NewReader(userdbJson))
+		if err != nil {
+			panic(fmt.Sprintf("Unable to send request: %s", err))
+		}
+		printResponse("Userdb", resp)
 	}
 }
 
