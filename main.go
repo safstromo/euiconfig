@@ -22,9 +22,11 @@ type EuiConfig struct {
 }
 
 type Config struct {
-	EuiUrl    string
-	EuiConfig EuiConfig
-	Response  http.Response
+	EuiUrl                   string
+	EuiConfig                EuiConfig
+	SelectedDTOFilters       []string
+	SelectedAttributeFilters []string
+	Response                 http.Response
 }
 
 func main() {
@@ -46,9 +48,14 @@ func main() {
 		},
 	}
 
+	dtoOptions := ConvertFiltersToHuhOptions(WIZEPASS_DTO_OPTIONS)
+	attributeOptions := ConvertFiltersToHuhOptions(WIZEPASS_ATTRIBUTE_OPTIONS)
+
 	client := Client{
-		EuiUrl:    &newConfig.EuiUrl,
-		EuiConfig: &newConfig.EuiConfig,
+		EuiUrl:                   &newConfig.EuiUrl,
+		EuiConfig:                &newConfig.EuiConfig,
+		SelectedDTOFilters:       &newConfig.SelectedDTOFilters,
+		SelectedAttributeFilters: &newConfig.SelectedAttributeFilters,
 	}
 
 	// Should we run in accessible mode?
@@ -67,6 +74,7 @@ func main() {
 				Description("The url to the Eui to configure"),
 		),
 
+		// EuiConfig
 		huh.NewGroup(
 			huh.NewInput().
 				Value(&newConfig.EuiConfig.EsUrl).
@@ -93,6 +101,20 @@ func main() {
 				Negative("No.").
 				Description("If rp is reqired for sign"),
 		),
+
+		// Filters
+		huh.NewGroup(
+			huh.NewMultiSelect[string]().
+				Options(dtoOptions...).
+				Title("Wizepass DTO Filters").
+				Value(&newConfig.SelectedDTOFilters),
+		),
+		huh.NewGroup(
+			huh.NewMultiSelect[string]().
+				Options(attributeOptions...).
+				Title("Wizepass Attribute Filters").
+				Value(&newConfig.SelectedAttributeFilters),
+		),
 	).WithAccessible(accessible)
 
 	err := form.Run()
@@ -102,6 +124,7 @@ func main() {
 	}
 
 	_ = spinner.New().Title("Sending config...").Accessible(accessible).Action(client.SendConfig).Run()
+	_ = spinner.New().Title("Sending filters...").Accessible(accessible).Action(client.SendFilters).Run()
 
 	{
 		var sb strings.Builder

@@ -1,7 +1,9 @@
 package main
 
+import "github.com/charmbracelet/huh"
+
 type WizepassFilter struct {
-	Field       string `json:"type"`
+	Field       string `json:"field"`
 	DisplayName string `json:"-"`
 	State       bool   `json:"state"`
 	Entity      string `json:"entity"`
@@ -137,4 +139,33 @@ var WIZEPASS_ATTRIBUTE_OPTIONS = []WizepassFilter{
 		State:       false,
 		Entity:      "wizepass_attribute",
 	},
+}
+
+func ConvertFiltersToHuhOptions(filters []WizepassFilter) []huh.Option[string] {
+	options := make([]huh.Option[string], len(filters))
+	for i, filter := range filters {
+		option := huh.NewOption(filter.DisplayName, filter.Field)
+		if filter.State {
+			option = option.Selected(true)
+		}
+		options[i] = option
+	}
+	return options
+}
+
+func GetFilters(allFilters []WizepassFilter, selectedFields []string) []WizepassFilter {
+	selectedMap := make(map[string]bool)
+	for _, field := range selectedFields {
+		selectedMap[field] = true
+	}
+
+	var activeFilters []WizepassFilter
+	for _, filter := range allFilters {
+		if selectedMap[filter.Field] {
+			f := filter
+			f.State = true
+			activeFilters = append(activeFilters, f)
+		}
+	}
+	return activeFilters
 }
