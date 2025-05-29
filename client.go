@@ -15,6 +15,7 @@ type Client struct {
 	SelectedAttributeFilters *[]string
 	Es                       *Es
 	Validity                 *Validity
+	SearchTypes              *[]SearchType
 	Response                 http.Response
 }
 
@@ -110,6 +111,24 @@ func (c *Client) SendEsConnection() {
 		panic(fmt.Sprintf("Unable to send request: %s", err))
 	}
 	printResponse("Es", resp)
+}
+
+// TODO: Cleanup/logging/errorhandling
+func (c *Client) SendSearchTypes() {
+	url := fmt.Sprintf("%s/eui/config/search-types", *c.EuiUrl)
+
+	for _, searchType := range *c.SearchTypes {
+		searchJson, err := json.Marshal(searchType)
+		if err != nil {
+			panic("Unable to parse json")
+		}
+
+		resp, err := http.Post(url, "application/json", bytes.NewReader(searchJson))
+		if err != nil {
+			panic(fmt.Sprintf("Unable to send request: %s", err))
+		}
+		printResponse("SearchTypes", resp)
+	}
 }
 
 func printResponse(title string, res *http.Response) {

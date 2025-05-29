@@ -26,9 +26,11 @@ type Config struct {
 	SelectedDTOFilters       []string
 	SelectedAttributeFilters []string
 	Es                       Es
+	AddedTypes               []SearchType
 	Response                 http.Response
 }
 
+// TODO:show request status  for user
 func main() {
 	newConfig := Config{
 		EuiUrl: "http://localhost:8080",
@@ -65,6 +67,7 @@ func main() {
 		SelectedAttributeFilters: &newConfig.SelectedAttributeFilters,
 		Es:                       &newConfig.Es,
 		Validity:                 &newConfig.Es.Validity,
+		SearchTypes:              &newConfig.AddedTypes,
 	}
 
 	// Should we run in accessible mode?
@@ -82,7 +85,7 @@ func main() {
 				Placeholder(newConfig.EuiUrl).
 				Description("The url to the Eui to configure"),
 		),
-		//
+
 		// // EuiConfig
 		// huh.NewGroup(
 		// 	huh.NewInput().
@@ -124,40 +127,40 @@ func main() {
 		// 		Title("Wizepass Attribute Filters").
 		// 		Value(&newConfig.SelectedAttributeFilters),
 		// ),
-
-		// Es connection
-		// TODO: tags/ Default confige
-		huh.NewGroup(
-			huh.NewNote().
-				Title("Create ES connection"),
-			huh.NewInput().
-				Value(&newConfig.Es.Name).
-				Title("Name").
-				Placeholder("Default Es"),
-			huh.NewInput().
-				Value(&newConfig.Es.UniqueID).
-				Title("UUID").
-				Placeholder("a0759625-f432-41f6-9dca-0c42e51aa1d5").
-				Description("UUID of Enrolment Service"),
-			huh.NewInput().
-				Value(&newConfig.Es.URL).
-				Title("Client Url").
-				Placeholder("client.wizepass.com").
-				Description("Url for client, dont include https://"),
-			huh.NewInput().
-				Value(&newConfig.Es.Validity.DisplayName).
-				Title("Validity name").
-				Placeholder("One year"),
-			huh.NewInput().
-				Value(&newConfig.Es.Validity.Description).
-				Title("Validity Description").
-				Placeholder("One year duration"),
-			huh.NewInput().
-				Value(&newConfig.Es.Validity.DurationString).
-				Title("Validity Duration").
-				Placeholder("365").
-				Description("Duration in days"),
-		),
+		//
+		// // Es connection
+		// // TODO: tags/ Default confige
+		// huh.NewGroup(
+		// 	huh.NewNote().
+		// 		Title("Create ES connection"),
+		// 	huh.NewInput().
+		// 		Value(&newConfig.Es.Name).
+		// 		Title("Name").
+		// 		Placeholder("Default Es"),
+		// 	huh.NewInput().
+		// 		Value(&newConfig.Es.UniqueID).
+		// 		Title("UUID").
+		// 		Placeholder("a0759625-f432-41f6-9dca-0c42e51aa1d5").
+		// 		Description("UUID of Enrolment Service"),
+		// 	huh.NewInput().
+		// 		Value(&newConfig.Es.URL).
+		// 		Title("Client Url").
+		// 		Placeholder("client.wizepass.com").
+		// 		Description("Url for client, dont include https://"),
+		// 	huh.NewInput().
+		// 		Value(&newConfig.Es.Validity.DisplayName).
+		// 		Title("Validity name").
+		// 		Placeholder("One year"),
+		// 	huh.NewInput().
+		// 		Value(&newConfig.Es.Validity.Description).
+		// 		Title("Validity Description").
+		// 		Placeholder("One year duration"),
+		// 	huh.NewInput().
+		// 		Value(&newConfig.Es.Validity.DurationString).
+		// 		Title("Validity Duration").
+		// 		Placeholder("365").
+		// 		Description("Duration in days"),
+		// ),
 	).WithAccessible(accessible)
 
 	err := form.Run()
@@ -166,9 +169,47 @@ func main() {
 		os.Exit(1)
 	}
 
-	_ = spinner.New().Title("Sending Euiconfig...").Accessible(accessible).Action(client.SendConfig).Run()
-	_ = spinner.New().Title("Sending filters...").Accessible(accessible).Action(client.SendFilters).Run()
-	_ = spinner.New().Title("Sending Es connection config...").Accessible(accessible).Action(client.SendEsConnection).Run()
+	// _ = spinner.New().Title("Sending Euiconfig...").Accessible(accessible).Action(client.SendConfig).Run()
+	// _ = spinner.New().Title("Sending filters...").Accessible(accessible).Action(client.SendFilters).Run()
+	// _ = spinner.New().Title("Sending Es connection config...").Accessible(accessible).Action(client.SendEsConnection).Run()
+
+	moreTypes := true
+
+	// TODO: fix description/cleanup/refactor
+	for moreTypes {
+		newSearchType := SearchType{
+			State:  true,
+			Entity: "wizepass",
+		}
+
+		searchTypeForm := huh.NewForm(huh.NewGroup(
+			huh.NewNote().
+				Title("Add SearchTypes").
+				Description("EUi seachtypes.\n"),
+
+			huh.NewInput().
+				Value(&newSearchType.Type).
+				Title("Please enter type").
+				Placeholder("user_id").
+				Description("Fields to search for"),
+
+			huh.NewConfirm().
+				Title("Add more searchtypes?").
+				Value(&moreTypes).
+				Affirmative("Yes!").
+				Negative("No.").
+				Description("Continue to add more searchTypes"),
+		)).WithAccessible(accessible)
+
+		err := searchTypeForm.Run()
+		if err != nil {
+			fmt.Println("Uh oh:", err)
+			os.Exit(1)
+		}
+		newConfig.AddedTypes = append(newConfig.AddedTypes, newSearchType)
+	}
+
+	_ = spinner.New().Title("Sending Searchtypes config...").Accessible(accessible).Action(client.SendSearchTypes).Run()
 
 	{
 		var sb strings.Builder
