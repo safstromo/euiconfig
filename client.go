@@ -13,6 +13,8 @@ type Client struct {
 	EuiConfig                *EuiConfig
 	SelectedDTOFilters       *[]string
 	SelectedAttributeFilters *[]string
+	Es                       *Es
+	Validity                 *Validity
 	Response                 http.Response
 }
 
@@ -38,9 +40,6 @@ func (c *Client) SendFilters() {
 	url := fmt.Sprintf("%s/eui/config/filters", *c.EuiUrl)
 	selectedAttributeFilters := GetFilters(WIZEPASS_ATTRIBUTE_OPTIONS, *c.SelectedAttributeFilters)
 	selectedDtoFilters := GetFilters(WIZEPASS_DTO_OPTIONS, *c.SelectedDTOFilters)
-
-	fmt.Println("sel filter:", len(selectedAttributeFilters))
-	fmt.Println("dto filter:", len(selectedDtoFilters))
 
 	for _, filter := range selectedAttributeFilters {
 		configJson, err := json.Marshal(filter)
@@ -92,6 +91,25 @@ func (c *Client) SendFilters() {
 		}
 
 	}
+}
+
+func (c *Client) SendEsConnection() {
+	url := fmt.Sprintf("%s/eui/config/es", *c.EuiUrl)
+
+	c.Es.Validity.SetDurationFromDays()
+
+	configJson, err := json.Marshal(c.Es)
+	if err != nil {
+		panic("Unable to parse json")
+	}
+
+	fmt.Println(string(configJson))
+
+	resp, err := http.Post(url, "application/json", bytes.NewReader(configJson))
+	if err != nil {
+		panic(fmt.Sprintf("Unable to send request: %s", err))
+	}
+	printResponse("Es", resp)
 }
 
 func printResponse(title string, res *http.Response) {
