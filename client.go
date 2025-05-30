@@ -6,7 +6,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
 type Client struct {
@@ -36,11 +39,12 @@ func (c *Client) SendConfig() {
 	if err != nil {
 		panic(fmt.Sprintf("Unable to send request: %s", err))
 	}
-	PrintEuiConfigResponse(resp)
+	printResponse("Eui Config", resp)
 }
 
 // TODO: Cleanup/logging/errorhandling
 func (c *Client) SendFilters() {
+	time.Sleep(1 * time.Second)
 	client := &http.Client{}
 
 	url := fmt.Sprintf("%s/eui/config/filters", *c.EuiUrl)
@@ -68,7 +72,8 @@ func (c *Client) SendFilters() {
 			res, _ := client.Do(req)
 
 			printResponse("AttributeFilter", res)
-
+		} else {
+			printResponse("AttributeFilter", resp)
 		}
 
 	}
@@ -94,12 +99,15 @@ func (c *Client) SendFilters() {
 			res, _ := client.Do(req)
 
 			printResponse("DtoFilter", res)
+		} else {
+			printResponse("DtoFilter", resp)
 		}
 
 	}
 }
 
 func (c *Client) SendEsConnection() {
+	time.Sleep(1 * time.Second)
 	url := fmt.Sprintf("%s/eui/config/es", *c.EuiUrl)
 
 	c.Es.Validity.SetDurationFromDays()
@@ -109,17 +117,16 @@ func (c *Client) SendEsConnection() {
 		panic("Unable to parse json")
 	}
 
-	fmt.Println(string(configJson))
-
 	resp, err := http.Post(url, "application/json", bytes.NewReader(configJson))
 	if err != nil {
 		panic(fmt.Sprintf("Unable to send request: %s", err))
 	}
-	printResponse("Es", resp)
+	printResponse("Es Connection", resp)
 }
 
 // TODO: Cleanup/logging/errorhandling
 func (c *Client) SendSearchTypes() {
+	time.Sleep(1 * time.Second)
 	url := fmt.Sprintf("%s/eui/config/search-types", *c.EuiUrl)
 
 	for _, searchType := range *c.SearchTypes {
@@ -139,6 +146,7 @@ func (c *Client) SendSearchTypes() {
 // TODO: Cleanup/logging/errorhandling
 // TODO: replace with added grouprighs to be able to add userdbs
 func (c *Client) SendGroupRights() {
+	time.Sleep(1 * time.Second)
 	url := fmt.Sprintf("%s/eui/config/rights", *c.EuiUrl)
 
 	for _, groupRight := range *c.AddedGroupRights {
@@ -151,11 +159,12 @@ func (c *Client) SendGroupRights() {
 		if err != nil {
 			panic(fmt.Sprintf("Unable to send request: %s", err))
 		}
-		printResponse("Group rights", resp)
+		printResponse("GroupRights", resp)
 	}
 }
 
 func (c *Client) SendUserdbConnection() {
+	time.Sleep(1 * time.Second)
 	url := fmt.Sprintf("%s/eui/config/userdb", *c.EuiUrl)
 
 	for _, userdb := range *c.AddedUserDbs {
@@ -168,11 +177,12 @@ func (c *Client) SendUserdbConnection() {
 		if err != nil {
 			panic(fmt.Sprintf("Unable to send request: %s", err))
 		}
-		printResponse("Userdb", resp)
+		printResponse("Userdb connection", resp)
 	}
 }
 
 func (c *Client) SendUserDbConfig() {
+	time.Sleep(1 * time.Second)
 	client := &http.Client{}
 
 	url := fmt.Sprintf("%s/eui/config/userdb/config", *c.EuiUrl)
@@ -199,12 +209,6 @@ func (c *Client) SendUserDbConfig() {
 	printResponse("Userdb config", res)
 }
 
-func printResponse(title string, res *http.Response) {
-	fmt.Println(title)
-	fmt.Println("Response Status: ", res.Status)
-	fmt.Println("Response Body: ", ReadBody(res))
-}
-
 func ReadBody(res *http.Response) string {
 	defer res.Body.Close()
 
@@ -214,4 +218,35 @@ func ReadBody(res *http.Response) string {
 	}
 
 	return string(bodyBytes)
+}
+
+func printResponse(title string, response *http.Response) {
+	var sb strings.Builder
+	keyword := func(s string) string {
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Render(s)
+	}
+
+	fmt.Fprintf(&sb, "%s\n\n", lipgloss.NewStyle().Bold(true).Render(title+" response: "))
+
+	fmt.Fprintf(&sb,
+		"%s\n%s\n%s",
+		lipgloss.NewStyle().Bold(true).Render(response.Status),
+		lipgloss.NewStyle().Bold(true).Render("Body: "),
+		keyword(ReadBody(response)),
+	)
+
+	if response.StatusCode == 200 || response.StatusCode == 201 {
+		fmt.Fprint(&sb, "\n\nGreat success!")
+	} else {
+		fmt.Fprint(&sb, "\n\nSomething went wrong")
+	}
+
+	fmt.Println(
+		lipgloss.NewStyle().
+			Width(80).
+			BorderStyle(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color("63")).
+			Padding(1, 2).
+			Render(sb.String()),
+	)
 }

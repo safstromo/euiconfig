@@ -97,12 +97,12 @@ func main() {
 	}
 
 	EuiConfigForm(&client, &newConfig)
-	// FiltersForm(&client, &newConfig)
-	// EsConnectionForm(&client, &newConfig)
-	// SearchTypeForm(&client, &newConfig)
-	// GroupRightsForm(&client, &newConfig)
-	// UserDbConnectionForm(&client, &newConfig)
-	// UserDbConfigForm(&client, &newConfig)
+	FiltersForm(&client, &newConfig)
+	EsConnectionForm(&client, &newConfig)
+	SearchTypeForm(&client, &newConfig)
+	GroupRightsForm(&client, &newConfig)
+	UserDbConnectionForm(&client, &newConfig)
+	UserDbConfigForm(&client, &newConfig)
 
 	{
 		var sb strings.Builder
