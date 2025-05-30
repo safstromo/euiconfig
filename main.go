@@ -32,7 +32,7 @@ type Config struct {
 	Response                 http.Response
 }
 
-// TODO:show request status  for user
+// TODO: connect userdb with groupright
 func main() {
 	newConfig := Config{
 		EuiUrl: "http://localhost:8080",
@@ -60,19 +60,6 @@ func main() {
 		UserDBConfig: NewDefaultUserDBConfig(),
 	}
 
-	client := Client{
-		EuiUrl:                   &newConfig.EuiUrl,
-		EuiConfig:                &newConfig.EuiConfig,
-		SelectedDTOFilters:       &newConfig.SelectedDTOFilters,
-		SelectedAttributeFilters: &newConfig.SelectedAttributeFilters,
-		Es:                       &newConfig.Es,
-		Validity:                 &newConfig.Es.Validity,
-		SearchTypes:              &newConfig.AddedTypes,
-		AddedGroupRights:         &newConfig.AddedGroupRights,
-		AddedUserDbs:             &newConfig.AddedUserDbs,
-		UserDBConfig:             &newConfig.UserDBConfig,
-	}
-
 	// Should we run in accessible mode?
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
@@ -96,18 +83,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	EuiConfigForm(&client, &newConfig)
-	FiltersForm(&client, &newConfig)
-	EsConnectionForm(&client, &newConfig)
-	SearchTypeForm(&client, &newConfig)
-	GroupRightsForm(&client, &newConfig)
-	UserDbConnectionForm(&client, &newConfig)
-	UserDbConfigForm(&client, &newConfig)
+	EuiConfigForm(&newConfig)
+	FiltersForm(&newConfig)
+	EsConnectionForm(&newConfig)
+	SearchTypeForm(&newConfig)
+	GroupRightsForm(&newConfig)
+	UserDbConnectionForm(&newConfig)
+	UserDbConfigForm(&newConfig)
 
 	{
 		var sb strings.Builder
 
-		fmt.Fprintf(&sb, "%s\n\n", lipgloss.NewStyle().Bold(true).Render("Thanks for using EuiConfig"))
+		fmt.Fprintf(&sb, "\n%s\n", lipgloss.NewStyle().Bold(true).Render("Thanks for using EuiConfig"))
 
 		fmt.Println(
 			lipgloss.NewStyle().

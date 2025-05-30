@@ -16,7 +16,7 @@ type UserFilter struct {
 }
 
 // TODO:no endpoint
-func UserDbFilterForm(client *Client, newConfig *Config) {
+func UserDbFilterForm(newConfig *Config) {
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	moreFields := true

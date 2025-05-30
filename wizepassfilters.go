@@ -148,7 +148,7 @@ var WIZEPASS_ATTRIBUTE_OPTIONS = []WizepassFilter{
 	},
 }
 
-func FiltersForm(client *Client, newConfig *Config) {
+func FiltersForm(newConfig *Config) {
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	dtoOptions := ConvertFiltersToHuhOptions(WIZEPASS_DTO_OPTIONS)
@@ -175,7 +175,7 @@ func FiltersForm(client *Client, newConfig *Config) {
 		os.Exit(1)
 	}
 
-	_ = spinner.New().Title("Sending filters...").Accessible(accessible).Action(client.SendFilters).Run()
+	_ = spinner.New().Title("Sending filters...").Accessible(accessible).Action(newConfig.SendFilters).Run()
 }
 
 func ConvertFiltersToHuhOptions(filters []WizepassFilter) []huh.Option[string] {

@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/huh/spinner"
 )
 
-func EuiConfigForm(client *Client, newConfig *Config) {
+func EuiConfigForm(newConfig *Config) {
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	euiConfigForm := huh.NewForm(
@@ -47,5 +47,5 @@ func EuiConfigForm(client *Client, newConfig *Config) {
 		os.Exit(1)
 	}
 
-	_ = spinner.New().Title("Sending Euiconfig...").Accessible(accessible).Action(client.SendConfig).Run()
+	_ = spinner.New().Title("Sending Euiconfig...").Accessible(accessible).Action(newConfig.SendConfig).Run()
 }

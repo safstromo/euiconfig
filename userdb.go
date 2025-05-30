@@ -17,7 +17,7 @@ type Userdb struct {
 	Url  string `json:"url"`
 }
 
-func UserDbConnectionForm(client *Client, newConfig *Config) {
+func UserDbConnectionForm(newConfig *Config) {
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	userDb := Userdb{}
@@ -47,7 +47,7 @@ func UserDbConnectionForm(client *Client, newConfig *Config) {
 
 	newConfig.AddedUserDbs = append(newConfig.AddedUserDbs, userDb)
 
-	_ = spinner.New().Title("Sending Userdb connection config...").Accessible(accessible).Action(client.SendUserdbConnection).Run()
+	_ = spinner.New().Title("Sending Userdb connection config...").Accessible(accessible).Action(newConfig.SendUserdbConnection).Run()
 }
 
 type UserDBConfig struct {
@@ -88,7 +88,7 @@ func NewDefaultUserDBConfig() UserDBConfig {
 	}
 }
 
-func UserDbConfigForm(client *Client, newConfig *Config) {
+func UserDbConfigForm(newConfig *Config) {
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	searchfilters := "objectclass=person"
@@ -101,7 +101,7 @@ func UserDbConfigForm(client *Client, newConfig *Config) {
 			Title("Userdb config"),
 
 			huh.NewInput().
-				Value(&client.UserDBConfig.LdapURL).
+				Value(&newConfig.UserDBConfig.LdapURL).
 				Title("Please enter LDAP URL/IP").
 				Placeholder("http://localhost.com"),
 			huh.NewInput().
@@ -128,35 +128,35 @@ func UserDbConfigForm(client *Client, newConfig *Config) {
 					return nil
 				}),
 			huh.NewInput().
-				Value(&client.UserDBConfig.LdapBaseDn).
+				Value(&newConfig.UserDBConfig.LdapBaseDn).
 				Title("LDAP base DN").
 				Placeholder("dc=lab2019,dc=local"),
 			huh.NewInput().
-				Value(&client.UserDBConfig.MapLdapGivenName).
+				Value(&newConfig.UserDBConfig.MapLdapGivenName).
 				Title("Map LDAP given name").
 				Placeholder("givenName"),
 			huh.NewInput().
-				Value(&client.UserDBConfig.MapLdapCommonName).
+				Value(&newConfig.UserDBConfig.MapLdapCommonName).
 				Title("Map LDAP common name").
 				Placeholder("cn"),
 			huh.NewInput().
-				Value(&client.UserDBConfig.MapLdapSurname).
+				Value(&newConfig.UserDBConfig.MapLdapSurname).
 				Title("Map LDAP surname").
 				Placeholder("sn"),
 			huh.NewInput().
-				Value(&client.UserDBConfig.MapLdapUserID).
+				Value(&newConfig.UserDBConfig.MapLdapUserID).
 				Title("Map LDAP user id").
 				Placeholder("samaccountname"),
 			huh.NewInput().
-				Value(&client.UserDBConfig.MapLdapEmail).
+				Value(&newConfig.UserDBConfig.MapLdapEmail).
 				Title("Map LDAP email").
 				Placeholder("mail"),
 			huh.NewInput().
-				Value(&client.UserDBConfig.MapLdapPersonalNumber).
+				Value(&newConfig.UserDBConfig.MapLdapPersonalNumber).
 				Title("Map LDAP personal number").
 				Placeholder("personalNumber"),
 			huh.NewInput().
-				Value(&client.UserDBConfig.MapLdapUserPrincipalName).
+				Value(&newConfig.UserDBConfig.MapLdapUserPrincipalName).
 				Title("Map LDAP principal name").
 				Placeholder("userPrincipalName"),
 			huh.NewInput().
@@ -166,19 +166,19 @@ func UserDbConfigForm(client *Client, newConfig *Config) {
 				Description("comma separated list"),
 			huh.NewConfirm().
 				Title("Use LDAP").
-				Value(&client.UserDBConfig.UseLdap).
+				Value(&newConfig.UserDBConfig.UseLdap).
 				Affirmative("Yes!").
 				Negative("No.").
 				Description("Use ldap or database"),
 			huh.NewConfirm().
 				Title("Use LDAP TLS").
-				Value(&client.UserDBConfig.LdapTLS).
+				Value(&newConfig.UserDBConfig.LdapTLS).
 				Affirmative("Yes!").
 				Negative("No.").
 				Description("Use LDAPS connection"),
 			huh.NewConfirm().
 				Title("LDAP use alternative attributes").
-				Value(&client.UserDBConfig.LdapUseAlternativeAttributes).
+				Value(&newConfig.UserDBConfig.LdapUseAlternativeAttributes).
 				Affirmative("Yes!").
 				Negative("No.").
 				Description("Enable use of alternative attibutes"),
@@ -191,13 +191,13 @@ func UserDbConfigForm(client *Client, newConfig *Config) {
 		os.Exit(1)
 	}
 
-	client.UserDBConfig.LdapAdditionalSearchFilters = strings.Split(searchfilters, ",")
+	newConfig.UserDBConfig.LdapAdditionalSearchFilters = strings.Split(searchfilters, ",")
 
 	port, _ := strconv.Atoi(ldapPort)
-	client.UserDBConfig.LdapPort = port
+	newConfig.UserDBConfig.LdapPort = port
 
 	limit, _ := strconv.Atoi(searchlimit)
-	client.UserDBConfig.SearchResultLimit = limit
+	newConfig.UserDBConfig.SearchResultLimit = limit
 
-	_ = spinner.New().Title("Sending Userdb connection config...").Accessible(accessible).Action(client.SendUserDbConfig).Run()
+	_ = spinner.New().Title("Sending Userdb connection config...").Accessible(accessible).Action(newConfig.SendUserDbConfig).Run()
 }

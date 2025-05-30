@@ -17,7 +17,7 @@ type GroupRight struct {
 }
 
 // TODO: fix description/cleanup/refactor
-func GroupRightsForm(client *Client, newConfig *Config) {
+func GroupRightsForm(newConfig *Config) {
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	moreTypes := true
@@ -63,5 +63,5 @@ func GroupRightsForm(client *Client, newConfig *Config) {
 		newConfig.AddedGroupRights = append(newConfig.AddedGroupRights, newGroupRight)
 	}
 
-	_ = spinner.New().Title("Sending Group right config...").Accessible(accessible).Action(client.SendGroupRights).Run()
+	_ = spinner.New().Title("Sending Group right config...").Accessible(accessible).Action(newConfig.SendGroupRights).Run()
 }

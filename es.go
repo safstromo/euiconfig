@@ -38,7 +38,7 @@ func (v *Validity) SetDurationFromDays() {
 }
 
 // Es Connection
-func EsConnectionForm(client *Client, newConfig *Config) {
+func EsConnectionForm(newConfig *Config) {
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	EsForm := huh.NewForm(
@@ -82,5 +82,5 @@ func EsConnectionForm(client *Client, newConfig *Config) {
 		os.Exit(1)
 	}
 
-	_ = spinner.New().Title("Sending Es connection config...").Accessible(accessible).Action(client.SendEsConnection).Run()
+	_ = spinner.New().Title("Sending Es connection config...").Accessible(accessible).Action(newConfig.SendEsConnection).Run()
 }

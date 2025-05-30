@@ -12,23 +12,9 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type Client struct {
-	EuiUrl                   *string
-	EuiConfig                *EuiConfig
-	SelectedDTOFilters       *[]string
-	SelectedAttributeFilters *[]string
-	Es                       *Es
-	Validity                 *Validity
-	SearchTypes              *[]SearchType
-	AddedGroupRights         *[]GroupRight
-	AddedUserDbs             *[]Userdb
-	UserDBConfig             *UserDBConfig
-	Response                 http.Response
-}
-
-func (c *Client) SendConfig() {
+func (c *Config) SendConfig() {
 	time.Sleep(1 * time.Second)
-	url := fmt.Sprintf("%s/eui/config", *c.EuiUrl)
+	url := fmt.Sprintf("%s/eui/config", c.EuiUrl)
 
 	configJson, err := json.Marshal(c.EuiConfig)
 	if err != nil {
@@ -43,13 +29,13 @@ func (c *Client) SendConfig() {
 }
 
 // TODO: Cleanup/logging/errorhandling
-func (c *Client) SendFilters() {
+func (c *Config) SendFilters() {
 	time.Sleep(1 * time.Second)
 	client := &http.Client{}
 
-	url := fmt.Sprintf("%s/eui/config/filters", *c.EuiUrl)
-	selectedAttributeFilters := GetFilters(WIZEPASS_ATTRIBUTE_OPTIONS, *c.SelectedAttributeFilters)
-	selectedDtoFilters := GetFilters(WIZEPASS_DTO_OPTIONS, *c.SelectedDTOFilters)
+	url := fmt.Sprintf("%s/eui/config/filters", c.EuiUrl)
+	selectedAttributeFilters := GetFilters(WIZEPASS_ATTRIBUTE_OPTIONS, c.SelectedAttributeFilters)
+	selectedDtoFilters := GetFilters(WIZEPASS_DTO_OPTIONS, c.SelectedDTOFilters)
 
 	for _, filter := range selectedAttributeFilters {
 		configJson, err := json.Marshal(filter)
@@ -106,9 +92,9 @@ func (c *Client) SendFilters() {
 	}
 }
 
-func (c *Client) SendEsConnection() {
+func (c *Config) SendEsConnection() {
 	time.Sleep(1 * time.Second)
-	url := fmt.Sprintf("%s/eui/config/es", *c.EuiUrl)
+	url := fmt.Sprintf("%s/eui/config/es", c.EuiUrl)
 
 	c.Es.Validity.SetDurationFromDays()
 
@@ -125,11 +111,11 @@ func (c *Client) SendEsConnection() {
 }
 
 // TODO: Cleanup/logging/errorhandling
-func (c *Client) SendSearchTypes() {
+func (c *Config) SendSearchTypes() {
 	time.Sleep(1 * time.Second)
-	url := fmt.Sprintf("%s/eui/config/search-types", *c.EuiUrl)
+	url := fmt.Sprintf("%s/eui/config/search-types", c.EuiUrl)
 
-	for _, searchType := range *c.SearchTypes {
+	for _, searchType := range c.AddedTypes {
 		searchJson, err := json.Marshal(searchType)
 		if err != nil {
 			panic("Unable to parse json")
@@ -145,11 +131,11 @@ func (c *Client) SendSearchTypes() {
 
 // TODO: Cleanup/logging/errorhandling
 // TODO: replace with added grouprighs to be able to add userdbs
-func (c *Client) SendGroupRights() {
+func (c *Config) SendGroupRights() {
 	time.Sleep(1 * time.Second)
-	url := fmt.Sprintf("%s/eui/config/rights", *c.EuiUrl)
+	url := fmt.Sprintf("%s/eui/config/rights", c.EuiUrl)
 
-	for _, groupRight := range *c.AddedGroupRights {
+	for _, groupRight := range c.AddedGroupRights {
 		grouprightJson, err := json.Marshal(groupRight)
 		if err != nil {
 			panic("Unable to parse json")
@@ -163,11 +149,11 @@ func (c *Client) SendGroupRights() {
 	}
 }
 
-func (c *Client) SendUserdbConnection() {
+func (c *Config) SendUserdbConnection() {
 	time.Sleep(1 * time.Second)
-	url := fmt.Sprintf("%s/eui/config/userdb", *c.EuiUrl)
+	url := fmt.Sprintf("%s/eui/config/userdb", c.EuiUrl)
 
-	for _, userdb := range *c.AddedUserDbs {
+	for _, userdb := range c.AddedUserDbs {
 		userdbJson, err := json.Marshal(userdb)
 		if err != nil {
 			panic("Unable to parse json")
@@ -181,11 +167,11 @@ func (c *Client) SendUserdbConnection() {
 	}
 }
 
-func (c *Client) SendUserDbConfig() {
+func (c *Config) SendUserDbConfig() {
 	time.Sleep(1 * time.Second)
 	client := &http.Client{}
 
-	url := fmt.Sprintf("%s/eui/config/userdb/config", *c.EuiUrl)
+	url := fmt.Sprintf("%s/eui/config/userdb/config", c.EuiUrl)
 
 	configJson, err := json.Marshal(c.UserDBConfig)
 	if err != nil {
@@ -198,7 +184,7 @@ func (c *Client) SendUserDbConfig() {
 	}
 	req.Header.Add("Content-Type", "application/json")
 
-	userdbUrl := (*c.AddedUserDbs)[0].Url
+	userdbUrl := (c.AddedUserDbs)[0].Url
 
 	query := req.URL.Query()
 	query.Add("url", userdbUrl)

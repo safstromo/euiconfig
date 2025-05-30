@@ -16,7 +16,7 @@ type SearchType struct {
 }
 
 // TODO: fix description/cleanup/refactor
-func SearchTypeForm(client *Client, newConfig *Config) {
+func SearchTypeForm(newConfig *Config) {
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	moreTypes := true
@@ -54,5 +54,5 @@ func SearchTypeForm(client *Client, newConfig *Config) {
 		newConfig.AddedTypes = append(newConfig.AddedTypes, newSearchType)
 	}
 
-	_ = spinner.New().Title("Sending Searchtypes config...").Accessible(accessible).Action(client.SendSearchTypes).Run()
+	_ = spinner.New().Title("Sending Searchtypes config...").Accessible(accessible).Action(newConfig.SendSearchTypes).Run()
 }
