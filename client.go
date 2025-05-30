@@ -18,6 +18,7 @@ type Client struct {
 	SearchTypes              *[]SearchType
 	AddedGroupRights         *[]GroupRight
 	AddedUserDbs             *[]Userdb
+	UserDBConfig             *UserDBConfig
 	Response                 http.Response
 }
 

@@ -28,6 +28,7 @@ type Config struct {
 	AddedTypes               []SearchType
 	AddedGroupRights         []GroupRight
 	AddedUserDbs             []Userdb
+	UserDBConfig             UserDBConfig
 	Response                 http.Response
 }
 
@@ -56,6 +57,7 @@ func main() {
 				UseDuration: true,
 			},
 		},
+		UserDBConfig: NewDefaultUserDBConfig(),
 	}
 
 	client := Client{
@@ -68,6 +70,7 @@ func main() {
 		SearchTypes:              &newConfig.AddedTypes,
 		AddedGroupRights:         &newConfig.AddedGroupRights,
 		AddedUserDbs:             &newConfig.AddedUserDbs,
+		UserDBConfig:             &newConfig.UserDBConfig,
 	}
 
 	// Should we run in accessible mode?
@@ -97,8 +100,9 @@ func main() {
 	// FiltersForm(&client, &newConfig)
 	// EsConnectionForm(&client, &newConfig)
 	// SearchTypeForm(&client, &newConfig)
-	GroupRightsForm(&client, &newConfig)
+	// GroupRightsForm(&client, &newConfig)
 	UserDbConnectionForm(&client, &newConfig)
+	UserDbConfigForm(&client, &newConfig)
 
 	{
 		var sb strings.Builder
