@@ -26,23 +26,23 @@ type Config struct {
 }
 
 func (c *Config) SendConfig() {
+	Log.Info("Starting send config")
 	time.Sleep(1 * time.Second)
 	url := fmt.Sprintf("%s/eui/config", c.EuiUrl)
 
-	configJson, err := json.Marshal(c.EuiConfig)
-	if err != nil {
-		panic("Unable to parse json")
-	}
+	configJson := CreateJson(c.EuiConfig)
 
+	Log.Info("Sending Eui config")
 	resp, err := http.Post(url, "application/json", bytes.NewReader(configJson))
 	if err != nil {
-		panic(fmt.Sprintf("Unable to send request: %s", err))
+		Log.Errorf("Unable to send request: %s", err)
 	}
 	printResponse("Eui Config", resp)
 }
 
 // TODO: Cleanup/logging/errorhandling
 func (c *Config) SendFilters() {
+	Log.Info("Starting send filters")
 	time.Sleep(1 * time.Second)
 	client := &http.Client{}
 
@@ -50,14 +50,14 @@ func (c *Config) SendFilters() {
 	selectedAttributeFilters := GetFilters(WIZEPASS_ATTRIBUTE_OPTIONS, c.SelectedAttributeFilters)
 	selectedDtoFilters := GetFilters(WIZEPASS_DTO_OPTIONS, c.SelectedDTOFilters)
 
+	Log.Info("Looping through and sending filters")
 	for _, filter := range selectedAttributeFilters {
-		configJson, err := json.Marshal(filter)
-		if err != nil {
-			panic("Unable to parse json")
-		}
+
+		configJson := CreateJson(filter)
 
 		resp, err := http.Post(url, "application/json", bytes.NewReader(configJson))
 		if err != nil {
+			Log.Errorf("Unable to send request: %s", err)
 			panic(fmt.Sprintf("Unable to send request: %s", err))
 		}
 
@@ -65,6 +65,7 @@ func (c *Config) SendFilters() {
 			fmt.Println("Unable to create filter sending PUT")
 			req, err := http.NewRequest(http.MethodPut, url, bytes.NewReader(configJson))
 			if err != nil {
+				Log.Errorf("Unable to send request: %s", err)
 				panic(fmt.Sprintf("Unable to send request: %s", err))
 			}
 
@@ -78,10 +79,8 @@ func (c *Config) SendFilters() {
 	}
 
 	for _, filter := range selectedDtoFilters {
-		configJson, err := json.Marshal(filter)
-		if err != nil {
-			panic("Unable to parse json")
-		}
+
+		configJson := CreateJson(filter)
 
 		resp, err := http.Post(url, "application/json", bytes.NewReader(configJson))
 		if err != nil {
@@ -111,10 +110,7 @@ func (c *Config) SendEsConnection() {
 
 	c.Es.Validity.SetDurationFromDays()
 
-	configJson, err := json.Marshal(c.Es)
-	if err != nil {
-		panic("Unable to parse json")
-	}
+	configJson := CreateJson(c.Es)
 
 	resp, err := http.Post(url, "application/json", bytes.NewReader(configJson))
 	if err != nil {
@@ -129,10 +125,7 @@ func (c *Config) SendSearchTypes() {
 	url := fmt.Sprintf("%s/eui/config/search-types", c.EuiUrl)
 
 	for _, searchType := range c.AddedTypes {
-		searchJson, err := json.Marshal(searchType)
-		if err != nil {
-			panic("Unable to parse json")
-		}
+		searchJson := CreateJson(searchType)
 
 		resp, err := http.Post(url, "application/json", bytes.NewReader(searchJson))
 		if err != nil {
@@ -149,10 +142,7 @@ func (c *Config) SendGroupRights() {
 	url := fmt.Sprintf("%s/eui/config/rights", c.EuiUrl)
 
 	for _, groupRight := range c.AddedGroupRights {
-		grouprightJson, err := json.Marshal(groupRight)
-		if err != nil {
-			panic("Unable to parse json")
-		}
+		grouprightJson := CreateJson(groupRight)
 
 		resp, err := http.Post(url, "application/json", bytes.NewReader(grouprightJson))
 		if err != nil {
@@ -167,10 +157,7 @@ func (c *Config) SendUserdbConnection() {
 	url := fmt.Sprintf("%s/eui/config/userdb", c.EuiUrl)
 
 	for _, userdb := range c.AddedUserDbs {
-		userdbJson, err := json.Marshal(userdb)
-		if err != nil {
-			panic("Unable to parse json")
-		}
+		userdbJson := CreateJson(userdb)
 
 		resp, err := http.Post(url, "application/json", bytes.NewReader(userdbJson))
 		if err != nil {
@@ -248,4 +235,14 @@ func printResponse(title string, response *http.Response) {
 			Padding(1, 2).
 			Render(sb.String()),
 	)
+}
+
+func CreateJson(object any) []byte {
+	Log.Info("Creating json")
+	json, err := json.Marshal(object)
+	if err != nil {
+		Log.Error("Unable to parse json")
+		panic("Unable to parse json")
+	}
+	return json
 }

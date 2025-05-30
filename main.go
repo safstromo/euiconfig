@@ -11,20 +11,26 @@ import (
 	"github.com/charmbracelet/log"
 )
 
-// TODO: connect userdb with groupright
-func main() {
-	Log := log.NewWithOptions(os.Stderr, log.Options{
-		ReportTimestamp: true,
-	})
+var Log *log.Logger
 
+func init() {
 	logFile, err := os.OpenFile("euiConfig.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatalf("failed to open log file: %v", err)
 	}
 	defer logFile.Close()
 
-	Log.SetOutput(logFile)
+	Log = log.NewWithOptions(os.Stderr, log.Options{
+		ReportTimestamp: true,
+	})
 
+	Log.SetOutput(logFile)
+	Log.Info("Logger initialized.")
+}
+
+// TODO: connect userdb with groupright
+func main() {
+	Log.Info("Creating default config")
 	newConfig := Config{
 		EuiUrl: "http://localhost:8080",
 		EuiConfig: EuiConfig{
@@ -54,6 +60,7 @@ func main() {
 	// Should we run in accessible mode?
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
+	Log.Info("Starting welcome form")
 	welcome := fmt.Sprintf("Welcome to _EuiConfig™_.\n\n%s",
 		lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Render("_!!Dont forget to disable auth before you continue!!_"))
 
@@ -71,8 +78,8 @@ func main() {
 		),
 	).WithAccessible(accessible)
 
-	errForm := form.Run()
-	if errForm != nil {
+	err := form.Run()
+	if err != nil {
 		fmt.Println("Uh oh:", err)
 		os.Exit(1)
 	}
@@ -86,6 +93,7 @@ func main() {
 	UserDbConfigForm(&newConfig)
 
 	{
+		Log.Info("Printing goodbye")
 		var sb strings.Builder
 
 		fmt.Fprintf(&sb, "\n%s\n", lipgloss.NewStyle().Bold(true).Render("Thanks for using EuiConfig"))
