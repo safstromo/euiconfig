@@ -44,7 +44,7 @@ func EsConnectionForm(newConfig *Config) {
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	EsForm := huh.NewForm(
-		// TODO: tags/ Default confige
+		// TODO: tags/ Default config
 		huh.NewGroup(
 			huh.NewNote().
 				Title("Create ES connection"),

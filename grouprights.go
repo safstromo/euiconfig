@@ -10,10 +10,17 @@ import (
 	"github.com/charmbracelet/huh/spinner"
 )
 
-type GroupRight struct {
+type GroupRightPost struct {
 	Name             string   `json:"name"`
 	Roles            []string `json:"roles"`
-	AllowedUserDBIDs []int    `json:"allowed_userdb_ids"`
+	AllowedUserDbIds []int    `json:"allowed_userdb_ids"`
+}
+
+type GroupRightsPut struct {
+	Id             int      `json:"id"`
+	Name           string   `json:"name"`
+	Roles          []string `json:"roles"`
+	AllowedUserDbs []Userdb `json:"allowed_userdbs"`
 }
 
 // TODO: fix description/cleanup/refactor
@@ -25,8 +32,8 @@ func GroupRightsForm(newConfig *Config) {
 	var claims string
 
 	for moreTypes {
-		newGroupRight := GroupRight{
-			AllowedUserDBIDs: []int{},
+		newGroupRight := GroupRightPost{
+			AllowedUserDbIds: []int{},
 		}
 
 		groupRightForm := huh.NewForm(huh.NewGroup(
@@ -65,4 +72,45 @@ func GroupRightsForm(newConfig *Config) {
 	}
 
 	_ = spinner.New().Title("Sending Group right config...").Accessible(accessible).Action(newConfig.SendGroupRights).Run()
+}
+
+func ConnectGroupRight(newConfig *Config) {
+	Log.Info("Starting connectGroupRight form")
+	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
+
+	for _, groupRight := range newConfig.AddedGroupRights {
+		add := false
+		userdb := newConfig.AddedUserDbs[0]
+
+		updateGroupRightForm := huh.NewForm(huh.NewGroup(
+			huh.NewNote().
+				Title("Add Userdb to groupRight?"),
+
+			huh.NewConfirm().
+				Title(groupRight.Name).
+				Value(&add).
+				Affirmative("Yes!").
+				Negative("No."),
+		)).WithAccessible(accessible)
+
+		err := updateGroupRightForm.Run()
+		if err != nil {
+			fmt.Println("Uh oh:", err)
+			os.Exit(1)
+		}
+
+		if add {
+			Log.Info("Attempting to add userdb to GroupRight")
+			for i := range newConfig.GroupRightsPut {
+				grPut := &newConfig.GroupRightsPut[i]
+				if grPut.Name == groupRight.Name {
+					grPut.AllowedUserDbs = append(grPut.AllowedUserDbs, userdb)
+					Log.Infof("Added userdb %s to groupRight %s.", userdb.Name, grPut.Name)
+				}
+				Log.Infof("%v", *grPut)
+			}
+		} else {
+			Log.Infof("User chose not to add userdb to %s.", groupRight.Name)
+		}
+	}
 }

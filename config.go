@@ -19,7 +19,8 @@ type Config struct {
 	SelectedAttributeFilters []string
 	Es                       Es
 	AddedTypes               []SearchType
-	AddedGroupRights         []GroupRight
+	AddedGroupRights         []GroupRightPost
+	GroupRightsPut           []GroupRightsPut
 	AddedUserDbs             []Userdb
 	UserDBConfig             UserDBConfig
 	Response                 http.Response
@@ -40,7 +41,7 @@ func (c *Config) SendConfig() {
 	printResponse("Eui Config", resp)
 }
 
-// TODO: Cleanup/logging/errorhandling
+// TODO: Cleanup
 func (c *Config) SendFilters() {
 	Log.Info("Starting send filters")
 	time.Sleep(1 * time.Second)
@@ -128,7 +129,7 @@ func (c *Config) SendEsConnection() {
 	printResponse("Es Connection", resp)
 }
 
-// TODO: Cleanup/logging/errorhandling
+// TODO: Cleanup
 func (c *Config) SendSearchTypes() {
 	Log.Info("Starting send searchtypes")
 	time.Sleep(1 * time.Second)
@@ -147,7 +148,7 @@ func (c *Config) SendSearchTypes() {
 	}
 }
 
-// TODO: Cleanup/logging/errorhandling
+// TODO: Cleanup
 // TODO: replace with added grouprighs to be able to add userdbs
 func (c *Config) SendGroupRights() {
 	Log.Info("Starting send grouprights")
@@ -163,6 +164,24 @@ func (c *Config) SendGroupRights() {
 			Log.Errorf("Unable to send request: %s", err)
 			panic(fmt.Sprintf("Unable to send request: %s", err))
 		}
+
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			Log.Errorf("Error reading response body: %v\n", err)
+			printResponse("Userdb connection", resp)
+			return
+		}
+
+		var addedGroupRight GroupRightsPut
+
+		Log.Info("Replacing added groupright")
+		err = json.Unmarshal(bodyBytes, &addedGroupRight)
+		if err != nil {
+			Log.Errorf("Error unmarshaling JSON: %v\n", err)
+			printResponse("Userdb connection", resp)
+		}
+
+		c.GroupRightsPut = append(c.GroupRightsPut, addedGroupRight)
 		printResponse("GroupRights", resp)
 	}
 }
@@ -181,6 +200,21 @@ func (c *Config) SendUserdbConnection() {
 			Log.Errorf("Unable to send request: %s", err)
 			panic(fmt.Sprintf("Unable to send request: %s", err))
 		}
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			Log.Errorf("Error reading response body: %v\n", err)
+			printResponse("Userdb connection", resp)
+			return
+		}
+
+		var userdb Userdb
+		err = json.Unmarshal(bodyBytes, &userdb)
+		if err != nil {
+			Log.Errorf("Error unmarshaling JSON: %v\n", err)
+			printResponse("Userdb connection", resp)
+		}
+
+		c.AddedUserDbs[0] = userdb
 		printResponse("Userdb connection", resp)
 	}
 }

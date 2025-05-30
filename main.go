@@ -89,11 +89,12 @@ func main() {
 	}
 
 	EuiConfigForm(&newConfig)
-	FiltersForm(&newConfig)
-	EsConnectionForm(&newConfig)
-	SearchTypeForm(&newConfig)
+	// FiltersForm(&newConfig)
+	// EsConnectionForm(&newConfig)
+	// SearchTypeForm(&newConfig)
 	GroupRightsForm(&newConfig)
 	UserDbConnectionForm(&newConfig)
+	ConnectGroupRight(&newConfig)
 	UserDbConfigForm(&newConfig)
 
 	{
