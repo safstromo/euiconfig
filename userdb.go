@@ -12,7 +12,7 @@ import (
 )
 
 type Userdb struct {
-	Id   int    `json:"-"`
+	Id   int    `json:"id"`
 	Name string `json:"name"`
 	Url  string `json:"url"`
 }

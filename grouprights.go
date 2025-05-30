@@ -113,4 +113,6 @@ func ConnectGroupRight(newConfig *Config) {
 			Log.Infof("User chose not to add userdb to %s.", groupRight.Name)
 		}
 	}
+
+	_ = spinner.New().Title("Sending connect Group right...").Accessible(accessible).Action(newConfig.SendConnectGroupRights).Run()
 }

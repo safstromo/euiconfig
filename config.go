@@ -186,6 +186,30 @@ func (c *Config) SendGroupRights() {
 	}
 }
 
+func (c *Config) SendConnectGroupRights() {
+	Log.Info("Starting send connect grouprights")
+	time.Sleep(1 * time.Second)
+	url := fmt.Sprintf("%s/eui/config/rights", c.EuiUrl)
+	client := &http.Client{}
+
+	for _, groupRight := range c.GroupRightsPut {
+		grouprightJson := CreateJson(groupRight)
+
+		req, err := http.NewRequest(http.MethodPut, url, bytes.NewReader(grouprightJson))
+		req.Header.Add("Content-Type", "application/json")
+
+		if err != nil {
+			Log.Errorf("Unable to send request: %s", err)
+			panic(fmt.Sprintf("Unable to send request: %s", err))
+		}
+
+		Log.Info("Sending request")
+		res, _ := client.Do(req)
+
+		printResponse("GroupRights", res)
+	}
+}
+
 func (c *Config) SendUserdbConnection() {
 	Log.Info("Starting send userdb connection")
 	time.Sleep(1 * time.Second)
