@@ -9,6 +9,14 @@ import (
 	"github.com/charmbracelet/huh/spinner"
 )
 
+type EuiConfig struct {
+	EsUrl             string   `json:"es_url"`
+	RpUrl             string   `json:"rp_url"`
+	RpSignId          string   `json:"rp_sign_id"`
+	RpRequestRequired bool     `json:"rp_request_required"`
+	RevokeComments    []string `json:"revoke_comments"`
+}
+
 func EuiConfigForm(newConfig *Config) {
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 

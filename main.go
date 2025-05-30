@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -10,27 +9,6 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 )
-
-type EuiConfig struct {
-	EsUrl             string   `json:"es_url"`
-	RpUrl             string   `json:"rp_url"`
-	RpSignId          string   `json:"rp_sign_id"`
-	RpRequestRequired bool     `json:"rp_request_required"`
-	RevokeComments    []string `json:"revoke_comments"`
-}
-
-type Config struct {
-	EuiUrl                   string
-	EuiConfig                EuiConfig
-	SelectedDTOFilters       []string
-	SelectedAttributeFilters []string
-	Es                       Es
-	AddedTypes               []SearchType
-	AddedGroupRights         []GroupRight
-	AddedUserDbs             []Userdb
-	UserDBConfig             UserDBConfig
-	Response                 http.Response
-}
 
 // TODO: connect userdb with groupright
 func main() {
@@ -63,11 +41,13 @@ func main() {
 	// Should we run in accessible mode?
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
+	welcome := fmt.Sprintf("Welcome to _EuiConfig™_.\n\n%s",
+		lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Render("_!!Dont forget to disable auth before you continue!!_"))
 	form := huh.NewForm(
 
 		huh.NewGroup(huh.NewNote().
 			Title("Eui Config").
-			Description("Welcome to _EuiConfig™_.\nDont forget to disable auth"),
+			Description(welcome),
 
 			huh.NewInput().
 				Value(&newConfig.EuiUrl).

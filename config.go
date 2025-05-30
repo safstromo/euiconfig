@@ -12,6 +12,19 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+type Config struct {
+	EuiUrl                   string
+	EuiConfig                EuiConfig
+	SelectedDTOFilters       []string
+	SelectedAttributeFilters []string
+	Es                       Es
+	AddedTypes               []SearchType
+	AddedGroupRights         []GroupRight
+	AddedUserDbs             []Userdb
+	UserDBConfig             UserDBConfig
+	Response                 http.Response
+}
+
 func (c *Config) SendConfig() {
 	time.Sleep(1 * time.Second)
 	url := fmt.Sprintf("%s/eui/config", c.EuiUrl)
