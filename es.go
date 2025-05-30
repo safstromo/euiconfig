@@ -28,9 +28,10 @@ type Validity struct {
 }
 
 func (v *Validity) SetDurationFromDays() {
+	Log.Info("Converting duration")
 	daysInt, err := strconv.Atoi(v.DurationString)
 	if err != nil {
-		fmt.Println("Unable to convert duration string to int: ", v.DurationString)
+		Log.Error("Unable to convert duration string to int: ", v.DurationString)
 	}
 
 	duration := time.Duration(daysInt) * 24 * time.Hour
@@ -39,6 +40,7 @@ func (v *Validity) SetDurationFromDays() {
 
 // Es Connection
 func EsConnectionForm(newConfig *Config) {
+	Log.Info("Starting es connection form")
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	EsForm := huh.NewForm(

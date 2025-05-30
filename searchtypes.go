@@ -17,6 +17,7 @@ type SearchType struct {
 
 // TODO: fix description/cleanup/refactor
 func SearchTypeForm(newConfig *Config) {
+	Log.Info("Starting searchtypes form")
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	moreTypes := true

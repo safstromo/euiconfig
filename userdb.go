@@ -18,6 +18,7 @@ type Userdb struct {
 }
 
 func UserDbConnectionForm(newConfig *Config) {
+	Log.Info("Starting userdb connection form")
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	userDb := Userdb{}
@@ -89,6 +90,7 @@ func NewDefaultUserDBConfig() UserDBConfig {
 }
 
 func UserDbConfigForm(newConfig *Config) {
+	Log.Info("Starting userdb config form")
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	searchfilters := "objectclass=person"

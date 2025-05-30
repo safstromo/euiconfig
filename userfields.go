@@ -17,6 +17,7 @@ type UserFilter struct {
 
 // TODO:no endpoint
 func UserDbFilterForm(newConfig *Config) {
+	Log.Info("Starting userdb filter form")
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	moreFields := true

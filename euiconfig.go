@@ -18,6 +18,7 @@ type EuiConfig struct {
 }
 
 func EuiConfigForm(newConfig *Config) {
+	Log.Info("Starting Eui config form")
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	euiConfigForm := huh.NewForm(

@@ -13,24 +13,28 @@ import (
 
 var Log *log.Logger
 
-func init() {
+func CreateLogger() (*log.Logger, *os.File) {
 	logFile, err := os.OpenFile("euiConfig.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatalf("failed to open log file: %v", err)
 	}
-	defer logFile.Close()
 
-	Log = log.NewWithOptions(os.Stderr, log.Options{
+	logger := log.NewWithOptions(os.Stderr, log.Options{
 		ReportTimestamp: true,
 	})
 
-	Log.SetOutput(logFile)
+	logger.SetOutput(logFile)
+	Log = logger
 	Log.Info("Logger initialized.")
+	return logger, logFile
 }
 
 // TODO: connect userdb with groupright
 func main() {
-	Log.Info("Creating default config")
+	logger, logFile := CreateLogger()
+	defer logFile.Close()
+
+	logger.Info("Creating default config")
 	newConfig := Config{
 		EuiUrl: "http://localhost:8080",
 		EuiConfig: EuiConfig{

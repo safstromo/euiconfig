@@ -18,6 +18,7 @@ type GroupRight struct {
 
 // TODO: fix description/cleanup/refactor
 func GroupRightsForm(newConfig *Config) {
+	Log.Info("Starting group rights form")
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	moreTypes := true

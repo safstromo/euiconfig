@@ -149,6 +149,7 @@ var WIZEPASS_ATTRIBUTE_OPTIONS = []WizepassFilter{
 }
 
 func FiltersForm(newConfig *Config) {
+	Log.Info("Starting wizepass filter form")
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
 	dtoOptions := ConvertFiltersToHuhOptions(WIZEPASS_DTO_OPTIONS)
@@ -179,6 +180,7 @@ func FiltersForm(newConfig *Config) {
 }
 
 func ConvertFiltersToHuhOptions(filters []WizepassFilter) []huh.Option[string] {
+	Log.Info("Converting filters to options")
 	options := make([]huh.Option[string], len(filters))
 	for i, filter := range filters {
 		option := huh.NewOption(filter.DisplayName, filter.Field)
@@ -191,6 +193,7 @@ func ConvertFiltersToHuhOptions(filters []WizepassFilter) []huh.Option[string] {
 }
 
 func GetFilters(allFilters []WizepassFilter, selectedFields []string) []WizepassFilter {
+	Log.Info("Converting selcted fields to filters")
 	selectedMap := make(map[string]bool)
 	for _, field := range selectedFields {
 		selectedMap[field] = true

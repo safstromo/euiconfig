@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/log"
 )
 
 type Config struct {
@@ -215,7 +214,7 @@ func (c *Config) SendUserDbConfig() {
 }
 
 func ReadBody(res *http.Response) string {
-	log.Info("Reading body")
+	Log.Info("Reading body")
 	defer res.Body.Close()
 
 	bodyBytes, err := io.ReadAll(res.Body)
@@ -228,6 +227,7 @@ func ReadBody(res *http.Response) string {
 
 func printResponse(title string, response *http.Response) {
 	Log.Infof("Creating response print for response: \n%v", response)
+	Log.Infof("Body: \n%s", string(ReadBody(response)))
 	var sb strings.Builder
 	keyword := func(s string) string {
 		return lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Render(s)
