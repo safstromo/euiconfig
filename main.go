@@ -96,65 +96,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	// EuiConfigForm(&client, &newConfig)
+	EuiConfigForm(&client, &newConfig)
 	// FiltersForm(&client, &newConfig)
 	// EsConnectionForm(&client, &newConfig)
 	// SearchTypeForm(&client, &newConfig)
 	// GroupRightsForm(&client, &newConfig)
-	UserDbConnectionForm(&client, &newConfig)
-	UserDbConfigForm(&client, &newConfig)
+	// UserDbConnectionForm(&client, &newConfig)
+	// UserDbConfigForm(&client, &newConfig)
 
 	{
 		var sb strings.Builder
-		keyword := func(s string) string {
-			return lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Render(s)
-		}
 
-		fmt.Fprintf(&sb, "%s\n\n", lipgloss.NewStyle().Bold(true).Render("CONFIG"))
-
-		fmt.Fprintf(&sb,
-			"%s%s\n",
-			lipgloss.NewStyle().Bold(true).Render("EUI Url: "),
-			keyword(newConfig.EuiUrl),
-		)
-
-		fmt.Fprintf(&sb,
-			"%s%s\n",
-			lipgloss.NewStyle().Bold(true).Render("Es Url: "),
-			keyword(newConfig.EuiConfig.EsUrl),
-		)
-		fmt.Fprintf(&sb,
-			"%s%s\n",
-			lipgloss.NewStyle().Bold(true).Render("Rp Url: "),
-			keyword(newConfig.EuiConfig.RpUrl),
-		)
-
-		if newConfig.EuiConfig.RpRequestRequired {
-			fmt.Fprintf(&sb,
-				"%s%s\n",
-				lipgloss.NewStyle().Bold(true).Render("Rp request Required: "),
-				keyword("true"),
-			)
-			fmt.Fprintf(&sb,
-				"%s%s\n",
-				lipgloss.NewStyle().Bold(true).Render("Rp Sign ID: "),
-				keyword(newConfig.EuiConfig.RpSignId),
-			)
-		}
-
-		fmt.Fprintf(&sb,
-			"%s\n",
-			lipgloss.NewStyle().Bold(true).Render("Revoke comments:"),
-		)
-		for _, v := range newConfig.EuiConfig.RevokeComments {
-			fmt.Fprintf(&sb,
-				"%s\n",
-				keyword(v),
-			)
-		}
-
-		fmt.Fprintf(&sb, "\n\n%s", client.Response.Status)
-		fmt.Fprint(&sb, "\n\nThanks for using EuiConfig!")
+		fmt.Fprintf(&sb, "%s\n\n", lipgloss.NewStyle().Bold(true).Render("Thanks for using EuiConfig"))
 
 		fmt.Println(
 			lipgloss.NewStyle().

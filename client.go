@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 )
 
 type Client struct {
@@ -23,6 +24,7 @@ type Client struct {
 }
 
 func (c *Client) SendConfig() {
+	time.Sleep(1 * time.Second)
 	url := fmt.Sprintf("%s/eui/config", *c.EuiUrl)
 
 	configJson, err := json.Marshal(c.EuiConfig)
@@ -34,7 +36,7 @@ func (c *Client) SendConfig() {
 	if err != nil {
 		panic(fmt.Sprintf("Unable to send request: %s", err))
 	}
-	c.Response = *resp
+	PrintEuiConfigResponse(resp)
 }
 
 // TODO: Cleanup/logging/errorhandling
@@ -198,15 +200,18 @@ func (c *Client) SendUserDbConfig() {
 }
 
 func printResponse(title string, res *http.Response) {
+	fmt.Println(title)
+	fmt.Println("Response Status: ", res.Status)
+	fmt.Println("Response Body: ", ReadBody(res))
+}
+
+func ReadBody(res *http.Response) string {
 	defer res.Body.Close()
 
 	bodyBytes, err := io.ReadAll(res.Body)
 	if err != nil {
-		fmt.Printf("Error reading response body: %v\n", err)
-		return
+		return "No body"
 	}
 
-	fmt.Println(title)
-	fmt.Println("Response Status: ", res.Status)
-	fmt.Println("Response Body: ", string(bodyBytes))
+	return string(bodyBytes)
 }
