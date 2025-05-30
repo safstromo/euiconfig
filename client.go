@@ -170,6 +170,33 @@ func (c *Client) SendUserdbConnection() {
 	}
 }
 
+func (c *Client) SendUserDbConfig() {
+	client := &http.Client{}
+
+	url := fmt.Sprintf("%s/eui/config/userdb/config", *c.EuiUrl)
+
+	configJson, err := json.Marshal(c.UserDBConfig)
+	if err != nil {
+		panic("Unable to parse json")
+	}
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(configJson))
+	if err != nil {
+		panic(fmt.Sprintf("Unable to send request: %s", err))
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	userdbUrl := (*c.AddedUserDbs)[0].Url
+
+	query := req.URL.Query()
+	query.Add("url", userdbUrl)
+	req.URL.RawQuery = query.Encode()
+
+	res, _ := client.Do(req)
+
+	printResponse("Userdb config", res)
+}
+
 func printResponse(title string, res *http.Response) {
 	defer res.Body.Close()
 

@@ -199,5 +199,5 @@ func UserDbConfigForm(client *Client, newConfig *Config) {
 	limit, _ := strconv.Atoi(searchlimit)
 	client.UserDBConfig.SearchResultLimit = limit
 
-	_ = spinner.New().Title("Sending Userdb connection config...").Accessible(accessible).Action(client.SendUserdbConnection).Run()
+	_ = spinner.New().Title("Sending Userdb connection config...").Accessible(accessible).Action(client.SendUserDbConfig).Run()
 }
