@@ -8,10 +8,23 @@ import (
 
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/log"
 )
 
 // TODO: connect userdb with groupright
 func main() {
+	Log := log.NewWithOptions(os.Stderr, log.Options{
+		ReportTimestamp: true,
+	})
+
+	logFile, err := os.OpenFile("euiConfig.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatalf("failed to open log file: %v", err)
+	}
+	defer logFile.Close()
+
+	Log.SetOutput(logFile)
+
 	newConfig := Config{
 		EuiUrl: "http://localhost:8080",
 		EuiConfig: EuiConfig{
@@ -43,6 +56,7 @@ func main() {
 
 	welcome := fmt.Sprintf("Welcome to _EuiConfig™_.\n\n%s",
 		lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Render("_!!Dont forget to disable auth before you continue!!_"))
+
 	form := huh.NewForm(
 
 		huh.NewGroup(huh.NewNote().
@@ -57,8 +71,8 @@ func main() {
 		),
 	).WithAccessible(accessible)
 
-	err := form.Run()
-	if err != nil {
+	errForm := form.Run()
+	if errForm != nil {
 		fmt.Println("Uh oh:", err)
 		os.Exit(1)
 	}
