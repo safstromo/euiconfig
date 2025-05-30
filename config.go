@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/log"
 )
 
 type Config struct {
@@ -32,7 +33,7 @@ func (c *Config) SendConfig() {
 
 	configJson := CreateJson(c.EuiConfig)
 
-	Log.Info("Sending Eui config")
+	Log.Info("Sending request")
 	resp, err := http.Post(url, "application/json", bytes.NewReader(configJson))
 	if err != nil {
 		Log.Errorf("Unable to send request: %s", err)
@@ -55,6 +56,7 @@ func (c *Config) SendFilters() {
 
 		configJson := CreateJson(filter)
 
+		Log.Info("Sending request")
 		resp, err := http.Post(url, "application/json", bytes.NewReader(configJson))
 		if err != nil {
 			Log.Errorf("Unable to send request: %s", err)
@@ -62,13 +64,15 @@ func (c *Config) SendFilters() {
 		}
 
 		if resp.StatusCode == 400 {
-			fmt.Println("Unable to create filter sending PUT")
+			Log.Error("Unable to create filter sending PUT")
+			Log.Info("Sending request")
 			req, err := http.NewRequest(http.MethodPut, url, bytes.NewReader(configJson))
 			if err != nil {
 				Log.Errorf("Unable to send request: %s", err)
 				panic(fmt.Sprintf("Unable to send request: %s", err))
 			}
 
+			Log.Info("Sending request")
 			res, _ := client.Do(req)
 
 			printResponse("AttributeFilter", res)
@@ -79,18 +83,21 @@ func (c *Config) SendFilters() {
 	}
 
 	for _, filter := range selectedDtoFilters {
-
 		configJson := CreateJson(filter)
 
+		Log.Info("Sending request")
 		resp, err := http.Post(url, "application/json", bytes.NewReader(configJson))
 		if err != nil {
+			Log.Errorf("Unable to send request: %s", err)
 			panic(fmt.Sprintf("Unable to send request: %s", err))
 		}
 
 		if resp.StatusCode == 400 {
 			fmt.Println("Unable to create filter sending PUT")
+			Log.Info("Sending request")
 			req, err := http.NewRequest(http.MethodPut, url, bytes.NewReader(configJson))
 			if err != nil {
+				Log.Errorf("Unable to send request: %s", err)
 				panic(fmt.Sprintf("Unable to send request: %s", err))
 			}
 
@@ -105,6 +112,7 @@ func (c *Config) SendFilters() {
 }
 
 func (c *Config) SendEsConnection() {
+	Log.Info("Starting send es connection")
 	time.Sleep(1 * time.Second)
 	url := fmt.Sprintf("%s/eui/config/es", c.EuiUrl)
 
@@ -112,8 +120,10 @@ func (c *Config) SendEsConnection() {
 
 	configJson := CreateJson(c.Es)
 
+	Log.Info("Sending request")
 	resp, err := http.Post(url, "application/json", bytes.NewReader(configJson))
 	if err != nil {
+		Log.Errorf("Unable to send request: %s", err)
 		panic(fmt.Sprintf("Unable to send request: %s", err))
 	}
 	printResponse("Es Connection", resp)
@@ -121,14 +131,17 @@ func (c *Config) SendEsConnection() {
 
 // TODO: Cleanup/logging/errorhandling
 func (c *Config) SendSearchTypes() {
+	Log.Info("Starting send searchtypes")
 	time.Sleep(1 * time.Second)
 	url := fmt.Sprintf("%s/eui/config/search-types", c.EuiUrl)
 
 	for _, searchType := range c.AddedTypes {
 		searchJson := CreateJson(searchType)
 
+		Log.Info("Sending request")
 		resp, err := http.Post(url, "application/json", bytes.NewReader(searchJson))
 		if err != nil {
+			Log.Errorf("Unable to send request: %s", err)
 			panic(fmt.Sprintf("Unable to send request: %s", err))
 		}
 		printResponse("SearchTypes", resp)
@@ -138,14 +151,17 @@ func (c *Config) SendSearchTypes() {
 // TODO: Cleanup/logging/errorhandling
 // TODO: replace with added grouprighs to be able to add userdbs
 func (c *Config) SendGroupRights() {
+	Log.Info("Starting send grouprights")
 	time.Sleep(1 * time.Second)
 	url := fmt.Sprintf("%s/eui/config/rights", c.EuiUrl)
 
 	for _, groupRight := range c.AddedGroupRights {
 		grouprightJson := CreateJson(groupRight)
 
+		Log.Info("Sending request")
 		resp, err := http.Post(url, "application/json", bytes.NewReader(grouprightJson))
 		if err != nil {
+			Log.Errorf("Unable to send request: %s", err)
 			panic(fmt.Sprintf("Unable to send request: %s", err))
 		}
 		printResponse("GroupRights", resp)
@@ -153,14 +169,17 @@ func (c *Config) SendGroupRights() {
 }
 
 func (c *Config) SendUserdbConnection() {
+	Log.Info("Starting send userdb connection")
 	time.Sleep(1 * time.Second)
 	url := fmt.Sprintf("%s/eui/config/userdb", c.EuiUrl)
 
 	for _, userdb := range c.AddedUserDbs {
 		userdbJson := CreateJson(userdb)
 
+		Log.Info("Sending request")
 		resp, err := http.Post(url, "application/json", bytes.NewReader(userdbJson))
 		if err != nil {
+			Log.Errorf("Unable to send request: %s", err)
 			panic(fmt.Sprintf("Unable to send request: %s", err))
 		}
 		printResponse("Userdb connection", resp)
@@ -168,18 +187,18 @@ func (c *Config) SendUserdbConnection() {
 }
 
 func (c *Config) SendUserDbConfig() {
+	Log.Info("Starting send userdb config")
 	time.Sleep(1 * time.Second)
 	client := &http.Client{}
 
 	url := fmt.Sprintf("%s/eui/config/userdb/config", c.EuiUrl)
 
-	configJson, err := json.Marshal(c.UserDBConfig)
-	if err != nil {
-		panic("Unable to parse json")
-	}
+	configJson := CreateJson(c.UserDBConfig)
 
+	Log.Info("Sending request")
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(configJson))
 	if err != nil {
+		Log.Errorf("Unable to send request: %s", err)
 		panic(fmt.Sprintf("Unable to send request: %s", err))
 	}
 	req.Header.Add("Content-Type", "application/json")
@@ -196,6 +215,7 @@ func (c *Config) SendUserDbConfig() {
 }
 
 func ReadBody(res *http.Response) string {
+	log.Info("Reading body")
 	defer res.Body.Close()
 
 	bodyBytes, err := io.ReadAll(res.Body)
@@ -207,6 +227,7 @@ func ReadBody(res *http.Response) string {
 }
 
 func printResponse(title string, response *http.Response) {
+	Log.Infof("Creating response print for response: \n%v", response)
 	var sb strings.Builder
 	keyword := func(s string) string {
 		return lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Render(s)
