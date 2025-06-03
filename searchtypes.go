@@ -19,6 +19,9 @@ func SearchTypeForm(newConfig *Config) {
 	Log.Info("Starting searchtypes form")
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
+	// Reset to be able to run again
+	newConfig.AddedTypes = []SearchType{}
+
 	moreTypes := true
 
 	for moreTypes {

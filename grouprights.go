@@ -30,6 +30,9 @@ func GroupRightsForm(newConfig *Config) {
 	moreTypes := true
 	var claims string
 
+	// Reset to be able to run this again
+	newConfig.AddedGroupRights = []GroupRightPost{}
+
 	for moreTypes {
 		newGroupRight := GroupRightPost{
 			AllowedUserDbIds: []int{},

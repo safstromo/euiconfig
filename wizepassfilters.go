@@ -151,6 +151,10 @@ func FiltersForm(newConfig *Config) {
 	Log.Info("Starting wizepass filter form")
 	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
 
+	// Reset to be able to run this again
+	newConfig.SelectedAttributeFilters = []string{}
+	newConfig.SelectedDTOFilters = []string{}
+
 	dtoOptions := ConvertFiltersToHuhOptions(WIZEPASS_DTO_OPTIONS)
 	attributeOptions := ConvertFiltersToHuhOptions(WIZEPASS_ATTRIBUTE_OPTIONS)
 
