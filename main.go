@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/huh"
@@ -61,29 +60,7 @@ func main() {
 		UserDBConfig: NewDefaultUserDBConfig(),
 	}
 
-	// Should we run in accessible mode?
-	accessible, _ := strconv.ParseBool(os.Getenv("ACCESSIBLE"))
-
-	Log.Info("Starting welcome form")
-	welcome := fmt.Sprintf("Welcome to _EuiConfig™_.\n\n%s",
-		lipgloss.NewStyle().Foreground(lipgloss.Color("212")).Render("_!!Dont forget to disable auth before you continue!!_"))
-
-	form := huh.NewForm(
-
-		huh.NewGroup(huh.NewNote().
-			Title("Eui Config").
-			Description(welcome),
-
-			huh.NewInput().
-				Value(&newConfig.EuiUrl).
-				Title("Please enter Eui Url").
-				Placeholder(newConfig.EuiUrl).
-				Description("The url to the Eui to configure"),
-		),
-	).WithAccessible(accessible)
-
-	RunForm(form)
-
+	WelcomeForm(&newConfig)
 	EuiConfigForm(&newConfig)
 	FiltersForm(&newConfig)
 	EsConnectionForm(&newConfig)
@@ -131,6 +108,6 @@ func RunForm(form *huh.Form) {
 					Render(sb.String()),
 			)
 		}
+		os.Exit(1)
 	}
-	os.Exit(1)
 }

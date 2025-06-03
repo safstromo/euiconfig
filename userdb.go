@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -130,6 +129,33 @@ func UserDbConfigForm(newConfig *Config) {
 				Title("LDAP base DN").
 				Placeholder("dc=lab2019,dc=local"),
 			huh.NewInput().
+				Value(&searchfilters).
+				Title("LDAP additional seach filters").
+				Placeholder("objectclass=person,objectclass=inetOrgPerson").
+				Description("comma separated list"),
+			huh.NewConfirm().
+				Title("Use LDAP").
+				Value(&newConfig.UserDBConfig.UseLdap).
+				Affirmative("Yes!").
+				Negative("No.").
+				Description("Use ldap or database"),
+			huh.NewConfirm().
+				Title("Use LDAP TLS").
+				Value(&newConfig.UserDBConfig.LdapTLS).
+				Affirmative("Yes!").
+				Negative("No.").
+				Description("Use LDAPS connection"),
+			huh.NewConfirm().
+				Title("LDAP use alternative attributes").
+				Value(&newConfig.UserDBConfig.LdapUseAlternativeAttributes).
+				Affirmative("Yes!").
+				Negative("No.").
+				Description("Enable use of alternative attibutes"),
+		),
+
+		huh.NewGroup(huh.NewNote().
+			Title("Userdb LDAB Mapping"),
+			huh.NewInput().
 				Value(&newConfig.UserDBConfig.MapLdapGivenName).
 				Title("Map LDAP given name").
 				Placeholder("givenName"),
@@ -157,29 +183,6 @@ func UserDbConfigForm(newConfig *Config) {
 				Value(&newConfig.UserDBConfig.MapLdapUserPrincipalName).
 				Title("Map LDAP principal name").
 				Placeholder("userPrincipalName"),
-			huh.NewInput().
-				Value(&searchfilters).
-				Title("LDAP additional seach filters").
-				Placeholder("objectclass=person,objectclass=inetOrgPerson").
-				Description("comma separated list"),
-			huh.NewConfirm().
-				Title("Use LDAP").
-				Value(&newConfig.UserDBConfig.UseLdap).
-				Affirmative("Yes!").
-				Negative("No.").
-				Description("Use ldap or database"),
-			huh.NewConfirm().
-				Title("Use LDAP TLS").
-				Value(&newConfig.UserDBConfig.LdapTLS).
-				Affirmative("Yes!").
-				Negative("No.").
-				Description("Use LDAPS connection"),
-			huh.NewConfirm().
-				Title("LDAP use alternative attributes").
-				Value(&newConfig.UserDBConfig.LdapUseAlternativeAttributes).
-				Affirmative("Yes!").
-				Negative("No.").
-				Description("Enable use of alternative attibutes"),
 		),
 	).WithAccessible(accessible)
 
