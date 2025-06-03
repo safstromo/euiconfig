@@ -50,11 +50,7 @@ func EuiConfigForm(newConfig *Config) {
 		),
 	).WithAccessible(accessible)
 
-	err := euiConfigForm.Run()
-	if err != nil {
-		fmt.Println("Uh oh:", err)
-		os.Exit(1)
-	}
+	RunForm(euiConfigForm)
 
 	_ = spinner.New().Title("Sending Euiconfig...").Accessible(accessible).Action(newConfig.SendConfig).Run()
 }

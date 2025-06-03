@@ -40,11 +40,7 @@ func UserDbConnectionForm(newConfig *Config) {
 		),
 	).WithAccessible(accessible)
 
-	err := userdbForm.Run()
-	if err != nil {
-		fmt.Println("Uh oh:", err)
-		os.Exit(1)
-	}
+	RunForm(userdbForm)
 
 	newConfig.AddedUserDbs = append(newConfig.AddedUserDbs, userDb)
 
@@ -187,11 +183,7 @@ func UserDbConfigForm(newConfig *Config) {
 		),
 	).WithAccessible(accessible)
 
-	err := userdbForm.Run()
-	if err != nil {
-		fmt.Println("Uh oh:", err)
-		os.Exit(1)
-	}
+	RunForm(userdbForm)
 
 	newConfig.UserDBConfig.LdapAdditionalSearchFilters = strings.Split(searchfilters, ",")
 

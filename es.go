@@ -78,11 +78,7 @@ func EsConnectionForm(newConfig *Config) {
 		),
 	).WithAccessible(accessible)
 
-	err := EsForm.Run()
-	if err != nil {
-		fmt.Println("Uh oh:", err)
-		os.Exit(1)
-	}
+	RunForm(EsForm)
 
 	_ = spinner.New().Title("Sending Es connection config...").Accessible(accessible).Action(newConfig.SendEsConnection).Run()
 }

@@ -47,11 +47,8 @@ func SearchTypeForm(newConfig *Config) {
 				Description("Continue to add more searchTypes"),
 		)).WithAccessible(accessible)
 
-		err := searchTypeForm.Run()
-		if err != nil {
-			fmt.Println("Uh oh:", err)
-			os.Exit(1)
-		}
+		RunForm(searchTypeForm)
+
 		newConfig.AddedTypes = append(newConfig.AddedTypes, newSearchType)
 	}
 

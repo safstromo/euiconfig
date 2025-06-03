@@ -82,11 +82,7 @@ func main() {
 		),
 	).WithAccessible(accessible)
 
-	err := form.Run()
-	if err != nil {
-		fmt.Println("Uh oh:", err)
-		os.Exit(1)
-	}
+	RunForm(form)
 
 	EuiConfigForm(&newConfig)
 	FiltersForm(&newConfig)
@@ -96,6 +92,7 @@ func main() {
 	UserDbConnectionForm(&newConfig)
 	ConnectGroupRight(&newConfig)
 	UserDbConfigForm(&newConfig)
+	UserDbFilterForm(&newConfig)
 
 	{
 		Log.Info("Printing goodbye")
@@ -112,4 +109,28 @@ func main() {
 				Render(sb.String()),
 		)
 	}
+}
+
+func RunForm(form *huh.Form) {
+	err := form.Run()
+	if err != nil {
+		{
+			Log.Info("Printing goodbye")
+			var sb strings.Builder
+
+			fmt.Fprintf(&sb, "\n%s %s\n", lipgloss.NewStyle().Bold(true).Render("Uh oh:"), err)
+
+			fmt.Fprintf(&sb, "\n%s\n", lipgloss.NewStyle().Bold(true).Render("Thanks for using EuiConfig"))
+
+			fmt.Println(
+				lipgloss.NewStyle().
+					Width(80).
+					BorderStyle(lipgloss.RoundedBorder()).
+					BorderForeground(lipgloss.Color("63")).
+					Padding(1, 2).
+					Render(sb.String()),
+			)
+		}
+	}
+	os.Exit(1)
 }

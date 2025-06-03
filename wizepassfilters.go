@@ -170,11 +170,7 @@ func FiltersForm(newConfig *Config) {
 		),
 	).WithAccessible(accessible)
 
-	err := filtersForm.Run()
-	if err != nil {
-		fmt.Println("Uh oh:", err)
-		os.Exit(1)
-	}
+	RunForm(filtersForm)
 
 	_ = spinner.New().Title("Sending filters...").Accessible(accessible).Action(newConfig.SendFilters).Run()
 }

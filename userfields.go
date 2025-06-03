@@ -47,11 +47,7 @@ func UserDbFilterForm(newConfig *Config) {
 				Description("Continue to add more filters"),
 		)).WithAccessible(accessible)
 
-		err := searchTypeForm.Run()
-		if err != nil {
-			fmt.Println("Uh oh:", err)
-			os.Exit(1)
-		}
+		RunForm(searchTypeForm)
 		// newConfig.AddedTypes = append(newConfig.AddedTypes, newFilter)
 	}
 

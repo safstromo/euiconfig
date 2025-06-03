@@ -60,11 +60,7 @@ func GroupRightsForm(newConfig *Config) {
 				Description("Continue to add more group rights"),
 		)).WithAccessible(accessible)
 
-		err := groupRightForm.Run()
-		if err != nil {
-			fmt.Println("Uh oh:", err)
-			os.Exit(1)
-		}
+		RunForm(groupRightForm)
 
 		newGroupRight.Roles = strings.Split(claims, ",")
 
@@ -93,11 +89,7 @@ func ConnectGroupRight(newConfig *Config) {
 				Negative("No."),
 		)).WithAccessible(accessible)
 
-		err := updateGroupRightForm.Run()
-		if err != nil {
-			fmt.Println("Uh oh:", err)
-			os.Exit(1)
-		}
+		RunForm(updateGroupRightForm)
 
 		if add {
 			Log.Info("Attempting to add userdb to GroupRight")
