@@ -97,20 +97,22 @@ func main() {
 			))
 		RunForm(selectForm)
 
-		// TODO: Add ACL form, Fix userdbfilters
 		switch configForm {
 
 		case Wizard:
 			WelcomeForm(&newConfig)
 			EuiConfigForm(&newConfig)
+			// TODO: ACL
 			FiltersForm(&newConfig)
 			EsConnectionForm(&newConfig)
 			SearchTypeForm(&newConfig)
 			GroupRightsForm(&newConfig)
+			// TODO: Upload EUI Cert
 			UserDbConnectionForm(&newConfig)
 			ConnectGroupRight(&newConfig)
 			UserDbConfigForm(&newConfig)
-			// UserDbFilterForm(&newConfig)
+			// TODO: Upload Ldap Cert
+			// TODO:UserDbFilterForm(&newConfig)
 		case EuiConfigs:
 			EuiConfigForm(&newConfig)
 		case EuiFilters:
